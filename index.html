@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.1.0/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.1.0/main.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Tennis Match</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/calendar">Calendar</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Your Account</h1>
+        <hr>
+        <form>
+            <div class="form-group">
+                <label for="eventTitle">Event Title</label>
+                <input type="text" class="form-control" id="eventTitle" placeholder="Event Title">
+            </div>
+            <div class="form-group">
+                <label for="eventStartDate">Start Date</label>
+                <input type="text" class="form-control" id="eventStartDate" placeholder="Start Date">
+                <small id="startDateHelp" class="form-text text-muted">Enter as yyyy-mm-dd.</small>
+            </div>
+            <div class="form-group">
+                <label for="eventStartTime">Start Time</label>
+                <input type="text" class="form-control" id="eventStartTime" placeholder="Start Time">
+                <small id="startDateHelp" class="form-text text-muted">Enter as 24 hr military time (ie 19:30).</small>
+            </div>
+            <div class="form-group">
+                <label for="eventEndDate">End Date</label>
+                <input type="text" class="form-control" id="eventEndDate" placeholder="End Date">
+                <small id="endDateHelp" class="form-text text-muted">Enter as yyyy-mm-dd.</small>
+            </div>
+            <div class="form-group">
+                <label for="eventEndTime">End Time</label>
+                <input type="text" class="form-control" id="eventEndTime" placeholder="End Time">
+                <small id="endDateHelp" class="form-text text-muted">Enter as 24 hr military time (ie 19:30).</small>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+        </form>
+
+    </div>
+
+
+    <script>
+        $("#submit-btn").on("click", function (event) {
+            event.preventDefault();
+            var start = $("#eventStartDate").val().trim();
+            if ($("#eventStartTime").val().trim() === "") {
+
+            } else {
+                start += "T" + $("#eventStartTime").val().trim();
+            }
+            var end = $("#eventEndDate").val().trim();
+            if ($("#eventEndTime").val().trim() === "") {
+
+            } else {
+                end += "T" + $("#eventEndTime").val().trim();
+            }
+            var newEvent = {
+                title: $("#eventTitle").val().trim(),
+                start: start,
+                end: end
+            };
+            console.log(newEvent);
+
+            $.post("/api/calendar", newEvent).then(function (data) {
+
+                console.log(data);
+                alert("Your date has been added!");
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>
