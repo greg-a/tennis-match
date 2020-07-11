@@ -33,6 +33,9 @@ app.get("/", function (req, res) {
 app.get("/calendar", function (req, res) {
     res.sendFile(path.join(__dirname, "calendar.html"));
 });
+app.get("/map", function (req, res) {
+    res.sendFile(path.join(__dirname, "map.html"));
+});
 
 app.get("/api/calendar", function (req, res) {
 
