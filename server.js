@@ -1,64 +1,54 @@
 require("dotenv").config();
 var express = require("express");
-var path = require("path");
-var mysql = require("mysql");
+var exphbs = require("express-handlebars");
+var session = require('express-session');
+
+var db = require("./models");
 
 var app = express();
-var PORT = 3000;
+var PORT = process.env.PORT || 3000;
 
-app.use(express.urlencoded({ extended: true }));
+// Middleware
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(express.static("public"));
 
-var connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: process.env.password,
-    database: "test_cal_one"
+app.use(session({
+  secret: "tennis123",
+  resave: true,
+  saveUninitialized: true
+}));
+
+// Handlebars
+app.engine(
+  "handlebars",
+  exphbs({
+    defaultLayout: "main"
+  })
+);
+app.set("view engine", "handlebars");
+
+// Routes
+require("./routes/apiRoutes")(app);
+require("./routes/htmlRoutes")(app);
+
+var syncOptions = { force: false };
+
+// If running a test, set syncOptions.force to true
+// clearing the `testdb`
+if (process.env.NODE_ENV === "test") {
+  syncOptions.force = true;
+}
+
+// Starting the server, syncing our models ------------------------------------/
+db.sequelize.sync({ force: true }).then(function () {
+  app.listen(PORT, function () {
+    console.log(
+      "==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.",
+      PORT,
+      PORT
+    );
+  });
 });
 
-connection.connect(function (err) {
-    if (err) {
-        console.error("error connecting: " + err.stack);
-        return;
-    }
-    console.log("connected as id " + connection.threadId);
-});
-
-
-app.get("/", function (req, res) {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.get("/calendar", function (req, res) {
-    res.sendFile(path.join(__dirname, "calendar.html"));
-});
-app.get("/map", function (req, res) {
-    res.sendFile(path.join(__dirname, "map.html"));
-});
-
-app.get("/api/calendar", function (req, res) {
-
-    connection.query("SELECT * FROM events", function(err, result) {
-        if (err) throw err;
-        return res.json(result);
-    });
-
-    
-});
-
-app.post("/api/calendar", function (req, res) {
-
-    connection.query("INSERT INTO events SET ?",
-    req.body,
-    function(err, res) {
-        if (err) throw err;
-        console.log(res);
-
-    });
-
-});
-
-app.listen(PORT, function () {
-    console.log("App listening on PORT " + PORT);
-});
+module.exports = app;
