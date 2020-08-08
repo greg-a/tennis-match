@@ -90,7 +90,12 @@ module.exports = function (app) {
     // create event
     app.post("/api/calendar", function(req,res) {
         if (req.session.loggedin) {
-            db.Event.create(req.body).then(function (results) {
+            db.Event.create({
+                title: req.body.title,
+                start: req.body.start,
+                end: req.body.end,
+                UserId: req.session.userID
+            }).then(function (results) {
                 res.send("eventCreated");
             });
         } else {
@@ -103,7 +108,7 @@ module.exports = function (app) {
     // Protect API so people can't see stored events via Postman, etc????
     app.get("/api/calendar", function(req, res) {
         if (req.session.loggedin) {
-            db.Event.findAll({}).then(function(results) {
+            db.Event.findAll({ where: { UserId: req.session.userID }}).then(function(results) {
                 res.json(results);
             });
         } else {

@@ -14,7 +14,13 @@ module.exports = function(sequelize, DataTypes) {
         }
     });
 
-    // will need to associate to the users dates db
+    Event.associate = function(models) {
+        Event.belongsTo(models.User, {
+          foreignKey: {
+            allowNull: false
+          }
+        });
+      };
 
     return Event;
 };
