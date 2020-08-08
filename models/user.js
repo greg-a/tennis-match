@@ -45,7 +45,11 @@ module.exports = function(sequelize, DataTypes) {
         }
     });
 
-    // will need to associate to the users dates db
+    User.associate = function (models) {
+        User.hasMany(models.Event, {
+            onDelete: "cascade"
+        });
+    };
 
     return User;
 };
