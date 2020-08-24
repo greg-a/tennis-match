@@ -102,6 +102,11 @@ module.exports = function(app) {
     }
   });
 
+    // testing the overlap compare
+  app.get("/schedule", function(req,res) {
+    res.render("schedule");
+  });
+
   app.get("/logout", function(req,res) {
     req.session.destroy();
     res.redirect("/");

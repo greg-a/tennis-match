@@ -1,7 +1,8 @@
 var db = require("../models");
 // const { request } = require("express");
 var crypto = require('crypto');
-const { sequelize } = require("../models");
+const { Sequelize, sequelize } = require("../models");
+const { timeStamp } = require("console");
 
 module.exports = function (app) {
     // login in auth
@@ -116,6 +117,29 @@ module.exports = function (app) {
         }
         
     });
+
+    // overlap of schedule between users
+    app.get("/api/overlap", function (req, res) {
+        // This uses User 1 as the input into the query. All returns are in reference to User 1's events. Change this by changing the createdByUser = values in the query
+        // let userNum=req.body.userNum;
+        let userNum=1;
+        sequelize.query("SELECT t2.*, t1.id overlapWithEventID, t1.UserID chosenUser, t3.username eventUserName FROM events t1 JOIN events t2 JOIN users t3 WHERE t1.UserID = " + userNum + " AND t3.id = t2.UserID AND t2.UserID != " + userNum + " AND date(t1.end) >= CURDATE() AND TIMESTAMPDIFF(MINUTE, GREATEST(t1.start, t2.start), LEAST(t1.`end`, t2.`end`)) >= 30;", {type: Sequelize.QueryTypes.SELECT}).then(function (result) {
+          res.json(result);
+        });
+      });
+
+    //   part of overlap test , getting a users events
+      app.get("/api/events/:user", function(req,res){
+        db.Event.findAll({
+          where: {
+            UserId: req.params.user
+          }
+        }).then(function(userEvents){
+          res.json(userEvents);
+        }).catch(function(error) {
+          console.log(error);
+        })
+      });
 
     // Delete an example by id
     //   app.delete("/api/examples/:id", function(req, res) {
